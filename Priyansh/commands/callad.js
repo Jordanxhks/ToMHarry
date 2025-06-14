@@ -2,10 +2,10 @@ module.exports.config = {
   name: "callad",
   version: "1.0.0",
   hasPermssion: 0,
-  credits: "NTKhang update & fix by DuyVuong and D-jukie Mod by TuấnDz",
-  description: "thông báo lỗi của bot đến admin hoặc góp ý",
+  credits: "NTK",
+  description: "Msg send",
   commandCategory: "Admin",
-  usages: "[lỗi gặp phải hoặc ý kiến]",
+  usages: "",
   cooldowns: 5,
 };
 
@@ -161,7 +161,7 @@ module.exports.run = async function({ api, event, Threads, args, Users }) {
     var uid = event.senderID;
 
     const moment = require("moment-timezone");
-    var gio = moment.tz("Asia/Manila").format("HH:mm:ss D/MM/YYYY");
+    var gio = moment.tz("Asia/Karachi").format("HH:mm:ss D/MM/YYYY");
     var soad = global.config.ADMINBOT.length;
     api.sendMessage(`[🤖] - Bot has just successfully sent your message to ${soad} Admin 🍄 \n[⏰] - Time: ${gio}`,
       event.threadID,
