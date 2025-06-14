@@ -14,7 +14,7 @@ module.exports.run = function({ api, event }) {
 	return api.getThreadInfo(event.threadID, (err, info) => {
 		if (err) return api.sendMessage("An error occurred!",event.threadID);
 if (!info.adminIDs.some(item => item.id == api.getCurrentUserID())) return api.sendMessage('Phle MeKo Admin Banao 😒', event.threadID, event.messageID);
-if(!mention[0]) return api.sendMessage("You must tag the person to demote it.",event.threadID);
+if(!mention[0]) return api.sendMessage("BaBe MenTion Kro",event.threadID);
 		if (info.adminIDs.some(item => item.id == event.senderID)) {
 			for (let o in mention) {
 				setTimeout(() => {				api.changeAdminStatus(event.threadID,mention[o],false,) 
