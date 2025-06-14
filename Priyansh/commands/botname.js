@@ -1,9 +1,9 @@
 module.exports.config = {
     name: "botname",
     version: "1.0.4",
-    hasPermssion: 1,
+    hasPermssion: 2,
     creditss: "jordanofficial",
-    description: "Automatically prevent change bot nickname",
+    description: "",
     commandCategory: "owner",
     usages: "",
     cooldowns: 5
@@ -15,9 +15,9 @@ module.exports.handleEvent = async function ({ api, args, event, client, __GLOBA
     let { nicknames } = await api.getThreadInfo(event.threadID)
     const nameBot = nicknames[api.getCurrentUserID()]
     if (nameBot !== `[ ${config.PREFIX} ] • ${config.BOTNAME}`) {
-        api.changeNickname(`[ ${global.config.PREFIX} ] • ${(!global.config.BOTNAME) ? "Made by CatalizCS and SpermLord" : global.config.BOTNAME}`, threadID, api.getCurrentUserID());
+        api.changeNickname(`》 ${global.config.PREFIX} 《 ❃ ➠ ${(!global.config.BOTNAME) ? "Made by CatalizCS and SpermLord" : global.config.BOTNAME}`, threadID, api.getCurrentUserID());
         setTimeout(() => {
-            return api.sendMessage(`BoT Ka NaMe ChanGe KRrny Ki Permission  OnLy Onwer ☆ JORDAN ☆ Ke PaSs Hai 🤞😎`, threadID);
+            return api.sendMessage(`𝐌𝐞𝐫𝐚 𝐍𝐚𝐌𝐞 𝐂𝐡𝐚𝐧𝐠𝐞 𝐊𝐢 𝐏𝐞𝐫𝐦𝐢𝐬𝐬𝐢𝐨𝐧 𝐎𝐧𝐥𝐲 𝐎𝐰𝐧𝐞𝐫 𝐊𝐞 𝐏𝐚𝐬 𝐇𝐚𝐢 ᥬ😜᭄ \n•—⚉—=❚❚ 𝐉𝐎𝐑𝐃𝐀𝐍 ❚❚=—⚉—•`, threadID);
         }, 1500);
     }
 }
