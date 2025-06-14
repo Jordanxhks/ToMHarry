@@ -3,7 +3,7 @@ module.exports.config = {
 	version: "1.0.0",
 	hasPermssion: 0,
 	credits: "Mirai Team",
-	description: "Change the nickname in your group or the person you tag",
+	description: "",
 	commandCategory: "Group",
 	usages: "[name]",
 	cooldowns: 3
