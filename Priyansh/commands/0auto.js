@@ -6,7 +6,7 @@ module.exports.config = {
   version: "1.5.1",
   hasPermission: 0,
   credits: "AMIROFFICIAL",
-  description: "GPT",
+  description: "Auto Ans",
   commandCategory: "AI",
   usages: "",
   cooldowns: 5,
