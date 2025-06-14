@@ -1,77 +1,83 @@
+const axios = require("axios");
+const request = require("request");
+
 module.exports.config = {
-  name: "cover",
-  version: "1.0.1",
-  hasPermssion: 0,
-  credits: "JRT mod by Clarence-DK",
-  description: "fb cover",
-  commandCategory: "",
-  usages: "[text1 - text2]",
-  cooldowns: 10,
-  dependencies: {
-    canvas: "",
-    axios: "",
-    "fs-extra": "",
-  },
+  name: "auto",
+  version: "1.5.1",
+  hasPermission: 0,
+  credits: "AMIROFFICIAL",
+  description: "GPT",
+  commandCategory: "AI",
+  usages: "",
+  cooldowns: 5,
 };
 
-module.exports.circle = async (image) => {
-  const jimp = global.nodemodule["jimp"];
-  image = await jimp.read(image);
-  image.circle();
-  return await image.getBufferAsync("image/png");
-}
-module.exports.run = async function ({ api, event, args, Users }) {
-  let { senderID, threadID, messageID } = event;
-  const { loadImage, createCanvas } = require("canvas");
-  const request = require('request');
-  const fs = global.nodemodule["fs-extra"];
-  const axios = global.nodemodule["axios"];
-  let pathImg = __dirname + `/cache/${senderID}.png`;
-  let pathAva = __dirname + `/cache/avtuser.png`;
-  let text = args.join(" ")
-  if (!text) return api.sendMessage('💢Please enter the correct format [text1 - text2] ', event.threadID, event.messageID);
-  const text1 = text.substr(0, text.indexOf(' - ')); 
-  if (!text1) return api.sendMessage('💢Please enter the correct format [text1 - text2] ', event.threadID, event.messageID);
-  const text2 = text.split(" - ").pop()
-  if (!text2) return api.sendMessage('💢Please enter the correct format [text1 - text2] ', event.threadID, event.messageID);
-  let Avatar = (
-    await axios.get(
-      `https://graph.facebook.com/${event.senderID}/picture?width=512&height=512&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`,
-      { responseType: "arraybuffer" }
-    )
-  ).data;
-  let getWanted = (
-    await axios.get(encodeURI(`https://i.ibb.co/cCpB1sQ/Ph-i-b-a-trung-thu.png`), {
-      responseType: "arraybuffer",
-    })
-  ).data;
-  fs.writeFileSync(pathAva, Buffer.from(Avatar, "utf-8"));
-  avatar = await this.circle(pathAva);
-  fs.writeFileSync(pathImg, Buffer.from(getWanted, "utf-8"));
-  let baseImage = await loadImage(pathImg);
-  let baseAva = await loadImage(avatar);
-  let canvas = createCanvas(baseImage.width, baseImage.height);
-  let ctx = canvas.getContext("2d");
-  ctx.drawImage(baseImage, 0, 0, 1920, 1080);
-  ctx.drawImage(baseAva, 820, 315, 283, 283);
-  ctx.font = "bold 70px Manrope";
-  ctx.fillStyle = "#ffff";
-  ctx.textAlign = "center";
-  fontSize = 40;
-  ctx.fillText(text1, 965, 715);
-  ctx.font = "55px Manrope";
-  ctx.fillStyle = "#ffff";
-  ctx.textAlign = "center";
-  fontSize = 20;
-  ctx.fillText(text2, 965, 800);
-  ctx.beginPath();
-  const imageBuffer = canvas.toBuffer();
-  fs.writeFileSync(pathImg, imageBuffer);
-  fs.removeSync(pathAva);
-  return api.sendMessage(
-    { attachment: fs.createReadStream(pathImg) },
-    threadID,
-    () => fs.unlinkSync(pathImg),
-    messageID
-  );
+let userMemory = {};
+let isActive = true;
+
+// ***
+module.exports.handleEvent = async function ({ api, event }) {
+  const { threadID, messageID, senderID, body, messageReply } = event;
+  if (!isActive || !body) return;
+
+  // **
+  if (!messageReply || messageReply.senderID !== api.getCurrentUserID()) return;
+
+  const userQuery = body.trim();
+
+  // **
+  if (!userMemory[senderID]) userMemory[senderID] = [];
+
+  // **
+  const conversationHistory = userMemory[senderID].join("\n");
+  const fullQuery = conversationHistory + `\nUser: ${userQuery}\nBot:`;
+
+  // ****
+  const apiURL = `https://shankar-gpt-3-api.vercel.app/api?message=${encodeURIComponent(fullQuery)}`;
+
+  try {
+    const response = await axios.get(apiURL);
+    let botReply = response.data.response || "MeKo Samjh Nhi Aya SaHi Seh Blo 😏";
+
+    // **
+    userMemory[senderID].push(`User: ${userQuery}`);
+    userMemory[senderID].push(`Bot: ${botReply}`);
+    if (userMemory[senderID].length > 15) userMemory[senderID].splice(0, 2);
+
+    return api.sendMessage({
+      body: botReply,
+      mentions: [{
+        tag: "Bot",
+        id: api.getCurrentUserID()
+      }]
+    }, threadID, messageID);
+  } catch (error) {
+    console.error("API Error:", error.message);
+    return api.sendMessage("MoYe MoYe", threadID, messageID);
+  }
+};
+
+// **
+module.exports.run = async function ({ api, event, args }) {
+  const { threadID, messageID, senderID } = event;
+  const command = args[0] && args[0].toLowerCase();
+
+  if (command === "on") {
+    isActive = true;
+    return api.sendMessage("✅ AuTo BOT is now active.", threadID, messageID);
+  } else if (command === "off") {
+    isActive = false;
+    return api.sendMessage("⚠️ AuTo bot is Now Off", threadID, messageID);
+  } else if (command === "clear") {
+    if (args[1] && args[1].toLowerCase() === "all") {
+      userMemory = {};
+      return api.sendMessage("🧹 History of interactions of all users has been cleared.", threadID, messageID);
+    }
+    if (userMemory[senderID]) {
+      delete userMemory[senderID];
+      return api.sendMessage("🧹 History of your conversation has been cleared.", threadID, messageID);
+    } else {
+      return api.sendMessage("⚠️ None of your history already exist.", threadID, messageID);
+    }
+  }
 };
