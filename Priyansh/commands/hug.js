@@ -28,7 +28,7 @@ module.exports.run = async ({ api, event, args }) => {
  let callback = function () {
             api.setMessageReaction("🙈", event.messageID, (err) => {}, true);
         api.sendMessage({
-                    body: "Hug 🙈" + tag + "🙈\n\MmmMmmMmm 🤗 🫂 💜\n☆ 𝗖𝗿𝗲𝗱𝗶𝘁'𝘀 ☆ ✦❥⋆⃝𝗝𝗢𝗥𝗗𝗔𝗡 ✦",
+                    body: "Hug 🙈" + tag + "🙈\n\MmmMmmMmm 🤗 🫂 💜\n\n☆ 𝗖𝗿𝗲𝗱𝗶𝘁'𝘀 ☆ ✦❥⋆⃝𝗝𝗢𝗥𝗗𝗔𝗡 ✦",
                                           mentions: [{
           tag: tag,
           id: Object.keys(event.mentions)[0]
