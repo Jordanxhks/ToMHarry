@@ -1,1 +1,82 @@
-{"4324079901022661":"😍","7240806675959592":"😍","4990492030965970":"😝","4851165554975903":"🥳","4637932626333174":"😼","6761934757213569":"😞","5037632012947171":"✌️","4901883756533403":"🐽","4717754098268921":"😍","4951886131558930":"😹","3452595501461916":"🖕🏻","4388265667905633":"☁️","7436569746417214":"😃","4701217456671702":"😹","4976383485757495":"😹","5027955940644506":"🐸","5654449191248345":"😹","4934561419927983":"🐝","5301552113194700":"💩","4266655120102635":"😈","4565130580243249":"👊","7795517087140744":"🤡","4675515832527693":"🤡","6643158805725660":"🤩","5903898356346958":"☁️","5317235418288546":"😹","7090872794316923":"🦋","5078418795551678":"😨","5471710646204187":"🧏‍♀️","4916087031780886":"🥺","6960901467314954":"🤣","5198457283593701":"😼","5052190171505309":"🖕","4971127076257702":"👍","5158908887503275":"🤮","4787914454626805":"🚬","7464919880250005":"👍","5468249026524567":"🖕","5660126514002729":"👍","5042646192529725":"👍","4699581356808446":"🍔","4881577645298753":"😀","5486037088085166":"👍🏻","7202530706486556":"🥰","5277760412260941":"😘","5500985063292946":"👍","5228724737175983":"😈"}
+module.exports.config = {
+    name: "groupnotify",
+    eventType: ["log:thread-admins", "log:thread-call", "log:thread-image", "log:thread-name", "log:thread-icon", "log:user-nickname"],
+    version: "1.0.0",
+    credits: "YourName",
+    description: "Notifies group about all changes",
+    dependencies: {}
+};
+
+module.exports.run = async function({ api, event }) {
+    const { threadID, logMessageType, logMessageData, author } = event;
+
+    try {
+        let msg = "";
+        const threadInfo = await api.getThreadInfo(threadID);
+        const threadName = threadInfo.threadName;
+
+        // Get user name who made the change
+        let adminName = "Someone";
+        if (author) {
+            const userInfo = await api.getUserInfo(author);
+            adminName = userInfo[author].name;
+        }
+
+        switch(logMessageType) {
+            case "log:thread-admins":
+                if (logMessageData.ADMIN_EVENT == "add_admin") {
+                    const addedAdmin = logMessageData.TARGET_ID;
+                    const userInfo = await api.getUserInfo(addedAdmin);
+                    const adminAddedName = userInfo[addedAdmin].name;
+                    msg = `📢 𝗔𝗱𝗺𝗶𝗻 𝗨𝗽𝗱𝗮𝘁𝗲\n\n${adminName} has promoted ${adminAddedName} to admin!`;
+                } else if (logMessageData.ADMIN_EVENT == "remove_admin") {
+                    const removedAdmin = logMessageData.TARGET_ID;
+                    const userInfo = await api.getUserInfo(removedAdmin);
+                    const adminRemovedName = userInfo[removedAdmin].name;
+                    msg = `📢 𝗔𝗱𝗺𝗶𝗻 𝗨𝗽𝗱𝗮𝘁𝗲\n\n${adminName} has demoted ${adminRemovedName} from admin!`;
+                }
+                break;
+
+            case "log:thread-call":
+                if (logMessageData.event == "group_call_started") {
+                    msg = `📞 𝗖𝗮𝗹𝗹 𝗡𝗼𝘁𝗶𝗳𝗶𝗰𝗮𝘁𝗶𝗼𝗻\n\n${adminName} has started a group call!`;
+                } else if (logMessageData.event == "group_call_ended") {
+                    const callDuration = logMessageData.call_duration;
+                    const minutes = Math.floor(callDuration / 60);
+                    const seconds = callDuration % 60;
+                    msg = `📞 𝗖𝗮𝗹𝗹 𝗘𝗻𝗱𝗲𝗱\n\nGroup call ended after ${minutes}m ${seconds}s`;
+                }
+                break;
+
+            case "log:thread-image":
+                msg = `🖼️ 𝗚𝗿𝗼𝘂𝗽 𝗜𝗺𝗮𝗴𝗲 𝗖𝗵𝗮𝗻𝗴𝗲𝗱\n\n${adminName} has updated the group's profile picture!`;
+                break;
+
+            case "log:thread-name":
+                const oldName = logMessageData.name;
+                const newName = threadName;
+                msg = `✏️ 𝗚𝗿𝗼𝘂𝗽 𝗡𝗮𝗺𝗲 𝗖𝗵𝗮𝗻𝗴𝗲𝗱\n\n${adminName} has renamed the group from "${oldName}" to "${newName}"`;
+                break;
+
+            case "log:thread-icon":
+                msg = `🤖 𝗚𝗿𝗼𝘂𝗽 𝗘𝗺𝗼𝗷𝗶 𝗖𝗵𝗮𝗻𝗴𝗲𝗱\n\n${adminName} has updated the group emoji to ${logMessageData.thread_icon}`;
+                break;
+
+            case "log:user-nickname":
+                const targetID = logMessageData.participant_id;
+                const userInfo = await api.getUserInfo(targetID);
+                const userName = userInfo[targetID].name;
+                const oldNickname = logMessageData.nickname || "no nickname";
+                const newNickname = logMessageData.nickname || "no nickname";
+                msg = `🏷️ 𝗡𝗶𝗰𝗸𝗻𝗮𝗺𝗲 𝗨𝗽𝗱𝗮𝘁𝗲\n\n${adminName} has changed ${userName}'s nickname from "${oldNickname}" to "${newNickname}"`;
+                break;
+        }
+
+        if (msg) {
+            api.sendMessage(msg, threadID);
+        }
+
+    } catch (err) {
+        console.error("Error in groupnotify:", err);
+    }
+};
