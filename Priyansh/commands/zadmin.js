@@ -3,9 +3,9 @@ module.exports.config = {
 	version: "1.0.5",
 	hasPermssion: 0, 
 	credits: "Mirai Team",
-	description: "Manage bot admin",
+	description: "",
 	commandCategory: "config",
-	usages: "[list/add/remove] [userID]",
+	usages: "[list/add/remove]",
     cooldowns: 5,
     dependencies: {
         "fs-extra": ""
@@ -143,4 +143,3 @@ module.exports.run = async function ({ api, event, args, Users, permssion, getTe
         }
     };
 }
-	
