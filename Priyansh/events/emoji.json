@@ -2,7 +2,7 @@ module.exports.config = {
     name: "groupnotify",
     eventType: ["log:thread-admins", "log:thread-call", "log:thread-image", "log:thread-name", "log:thread-icon", "log:user-nickname"],
     version: "1.0.0",
-    credits: "YourName",
+    credits: "Amir",
     description: "Notifies group about all changes",
     dependencies: {}
 };
